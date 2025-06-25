@@ -18,7 +18,7 @@ class ContactsController extends Controller
 
         return Inertia::render('contacts/Index', [
             'resource' => $contactsList,
-            'filters' => $request->all(),
+            'filters' => ['search' => $request->input('search', '')],
         ]);
     }
 }
