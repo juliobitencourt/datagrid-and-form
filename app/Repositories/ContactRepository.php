@@ -20,9 +20,9 @@ class ContactRepository implements ContactRepositoryInterface
         return $this->model::query()
             ->when($request->input('search'), function ($query, $search) {
                 return $query
-                    ->where('first_name', 'like', '%'.$search.'%')
-                    ->orWhere('last_name', 'like', '%'.$search.'%')
-                    ->orWhere('email', 'like', '%'.$search.'%');
+                    ->where('first_name', 'ilike', '%'.$search.'%')
+                    ->orWhere('last_name', 'ilike', '%'.$search.'%')
+                    ->orWhere('email', 'ilike', '%'.$search.'%');
             })
             ->when($request->input('sort'), function ($query, $sort) {
                 $sortFields = explode('|', $sort);
