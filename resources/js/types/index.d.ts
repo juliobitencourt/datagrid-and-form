@@ -17,6 +17,15 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface ResourceProps {
+    data: any[];
+    per_page: number;
+    current_page: number;
+    page_name: string;
+    total: number;
+    last_page: number;
+}
+
 export type AppPageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     name: string;
     quote: { message: string; author: string };
