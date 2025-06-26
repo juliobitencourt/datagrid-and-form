@@ -3,10 +3,10 @@ import { Datagrid } from '@/components/ui/datagrid';
 import { useResourceHandlers } from '@/composables/useResourceHandlers';
 import AppLayout from '@/layouts/AppLayout.vue';
 import ResourceLayout from '@/layouts/ResourceLayout.vue';
+import { useContactsStore } from '@/stores/contacts';
 import { type BreadcrumbItem, type ResourceProps } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { Edit, Trash2 } from 'lucide-vue-next';
-import { useContactsStore } from '@/stores/contacts';
 
 const contactsStore = useContactsStore();
 
@@ -18,7 +18,7 @@ const props = defineProps<{
             {
                 field: string;
                 direction: string;
-            }
+            },
         ];
     };
 }>();
@@ -32,13 +32,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const { handleAction, handleBulkAction, handleExport, handleNavigation, handleSearch, handleSorting, handlePrimaryAction } = useResourceHandlers('contacts');
+const { handleAction, handleBulkAction, handleExport, handleNavigation, handleSearch, handleSorting, handlePrimaryAction } =
+    useResourceHandlers('contacts');
 
 const columns = [
     { key: 'first_name', label: 'First Name', sortable: true },
     { key: 'last_name', label: 'Last Name', sortable: true },
     { key: 'email', label: 'E-mail', sortable: true },
-    { key: 'birth_date', label: 'Birthdate', sortable: true, sort_direction: "desc" as const },
+    { key: 'birth_date', label: 'Birthdate', sortable: true, sort_direction: 'desc' as const },
     { key: 'visits', label: 'Visits', sortable: true },
     { key: 'created_at', label: 'Created At', sortable: true },
     { key: 'updated_at', label: 'Updated At', sortable: true },

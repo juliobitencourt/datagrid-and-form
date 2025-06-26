@@ -1,12 +1,12 @@
 import Datagrid from '@/components/ui/datagrid/Datagrid.vue';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/vue';
+import { createPinia, setActivePinia } from 'pinia';
 import { describe, expect, it, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia'
 
 beforeEach(() => {
-  setActivePinia(createPinia())
-})
+    setActivePinia(createPinia());
+});
 
 const gridTitle = 'Users';
 
