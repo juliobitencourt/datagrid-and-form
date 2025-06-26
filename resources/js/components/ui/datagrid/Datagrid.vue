@@ -4,7 +4,7 @@ import { ref, watch, computed } from 'vue';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/composables/useInitials';
-import { ChevronsUpDown, Ellipsis, FileDown, LucideProps, CircleX } from 'lucide-vue-next';
+import { ChevronDown, ChevronUp, ChevronsUpDown, Ellipsis, FileDown, LucideProps, CircleX } from 'lucide-vue-next';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,10 +15,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DatagridExportData from './DatagridExportData.vue';
 import { FunctionalComponent } from 'vue';
 import _ from 'lodash';
+import { useContactsStore } from '@/stores/contacts';
+
+const contactsStore = useContactsStore();
 
 interface Column {
     key: string
     label: string
+    sortable?: boolean
+    sort_direction?: "asc" | "desc"
 }
 
 export interface Action {
@@ -29,11 +34,11 @@ export interface Action {
 
 interface Filter {
     search: string
+    sort?: string
 }
 
 interface DatagridProps {
     gridTitle: string
-    filter: Filter
     advancedFilter?: boolean
     showHeader?: boolean
     checkbox?: boolean
@@ -65,7 +70,7 @@ const props = withDefaults(defineProps<DatagridProps>(), {
 
 const loading = ref(false);
 
-const emit = defineEmits(['action', 'bulk-action', 'search', 'export-data', 'primary-action', 'navigation'])
+const emit = defineEmits(['action', 'bulk-action', 'search', 'sort', 'export-data', 'primary-action', 'navigation'])
 
 const { getInitials } = useInitials();
 
@@ -111,6 +116,10 @@ const toggleRowSelection = (id: number, checked: boolean, index: number) => {
   }
 }
 
+const sortByColumn = (column: Column) => {
+    emit('sort', column)
+}
+
 const action = (action: Action, item: any) => {
     emit('action', action, item)
 }
@@ -125,7 +134,7 @@ const exportData = (format: string) => {
     emit('export-data', format, items)
 }
 
-const searchTerm = ref(props.filter.search)
+const searchTerm = ref(contactsStore.filter.search)
 watch(searchTerm, _.debounce(function (value) {
     emit('search', value)
 }, 300))
@@ -463,7 +472,21 @@ const navigate = (to: string) => {
                                 role="columnheader"
                                 class="p-2 pl-0 flex-1 font-semibold"
                             >
-                                {{ column.label }}
+                                <div class="flex items-center cursor-pointer">
+                                    {{ column.label }}
+                                    <Button
+                                        v-if="column.sortable"
+                                        variant="ghost"
+                                        size="icon"
+                                        class="ml-2 p-1 focus-visible:ring-2 focus-visible:ring-primary"
+                                        @click="sortByColumn(column)"
+                                        :aria-label="`Sort by ${column.label}`"
+                                    >
+                                        <ChevronsUpDown class="size-4" v-if="contactsStore.filter.sort[0].field != column.key" />
+                                        <ChevronDown class="size-4" v-else-if="contactsStore.filter.sort[0].field == column.key && contactsStore.filter.sort[0].direction === 'desc'" />
+                                        <ChevronUp class="size-4" v-else-if="contactsStore.filter.sort[0].field == column.key && contactsStore.filter.sort[0].direction === 'asc'" />
+                                    </Button>
+                                </div>
                             </th>
                             <th class="p-2 pl-0 pr-4 text-right">Actions</th>
                         </tr>

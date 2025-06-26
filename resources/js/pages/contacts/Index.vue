@@ -6,13 +6,24 @@ import ResourceLayout from '@/layouts/ResourceLayout.vue';
 import { type BreadcrumbItem, type ResourceProps } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { Edit, Trash2 } from 'lucide-vue-next';
+import { useContactsStore } from '@/stores/contacts';
+
+const contactsStore = useContactsStore();
 
 const props = defineProps<{
     resource: ResourceProps;
-    filters: {
+    filter: {
         search: string;
+        sort: [
+            {
+                field: string;
+                direction: string;
+            }
+        ];
     };
 }>();
+
+contactsStore.filter = props.filter;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,16 +32,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const { handleAction, handleBulkAction, handleExport, handleNavigation, handleSearch, handlePrimaryAction } = useResourceHandlers('contacts');
+const { handleAction, handleBulkAction, handleExport, handleNavigation, handleSearch, handleSorting, handlePrimaryAction } = useResourceHandlers('contacts');
 
 const columns = [
-    { key: 'first_name', label: 'First Name' },
-    { key: 'last_name', label: 'Last Name' },
-    { key: 'email', label: 'E-mail' },
-    { key: 'birth_date', label: 'Birthdate' },
-    { key: 'visits', label: 'Visits' },
-    { key: 'created_at', label: 'Created At' },
-    { key: 'updated_at', label: 'Updated At' },
+    { key: 'first_name', label: 'First Name', sortable: true },
+    { key: 'last_name', label: 'Last Name', sortable: true },
+    { key: 'email', label: 'E-mail', sortable: true },
+    { key: 'birth_date', label: 'Birthdate', sortable: true, sort_direction: "desc" as const },
+    { key: 'visits', label: 'Visits', sortable: true },
+    { key: 'created_at', label: 'Created At', sortable: true },
+    { key: 'updated_at', label: 'Updated At', sortable: true },
 ];
 
 const actions = [
@@ -52,7 +63,6 @@ const actions = [
                     :data="{ items: props.resource.data }"
                     :columns="columns"
                     :actions="actions"
-                    :filter="{ search: filters.search || '' }"
                     primary-action-title="New Contact"
                     :current-page="props.resource.current_page"
                     :per-page="props.resource.per_page"
@@ -61,6 +71,7 @@ const actions = [
                     @action="handleAction"
                     @export-data="handleExport"
                     @search="handleSearch"
+                    @sort="handleSorting"
                     @primary-action="handlePrimaryAction"
                     @navigation="handleNavigation"
                 />

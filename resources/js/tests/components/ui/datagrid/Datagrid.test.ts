@@ -2,22 +2,25 @@ import Datagrid from '@/components/ui/datagrid/Datagrid.vue';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/vue';
 import { describe, expect, it, vi } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia'
+
+beforeEach(() => {
+  setActivePinia(createPinia())
+})
 
 const gridTitle = 'Users';
 
 interface Column {
     key: string;
     label: string;
+    sortable?: boolean;
+    sort_direction?: 'asc' | 'desc';
 }
 
 const columns: Column[] = [
     { key: 'id', label: 'ID' },
-    { key: 'name', label: 'Nome' },
+    { key: 'name', label: 'Name', sortable: true, sort_direction: 'asc' },
 ];
-
-// const actions = [
-//   { label: 'Edit', handler: vi.fn() }
-// ]
 
 const data = {
     items: [
@@ -42,7 +45,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -64,7 +66,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: false,
                     checkbox: true,
@@ -86,7 +87,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -110,7 +110,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -134,7 +133,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -158,7 +156,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -180,7 +177,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -202,7 +198,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -224,7 +219,6 @@ describe('Datagrid.vue', () => {
             render(Datagrid, {
                 props: {
                     gridTitle,
-                    filter: { search: '' },
                     avatar: false,
                     showHeader: true,
                     checkbox: true,
@@ -250,7 +244,7 @@ describe('Datagrid.vue', () => {
     describe('Filtering', () => {
         it('filters data when search input is filled', async () => {
             const { emitted } = render(Datagrid, {
-                props: { gridTitle, filter: { search: '' }, data, columns, currentPage: 1, total: 2, perPage: 10 },
+                props: { gridTitle, data, columns, currentPage: 1, total: 2, perPage: 10 },
                 global: { mocks: { $t: mockT, $tc: mockT } },
             });
 
@@ -262,43 +256,16 @@ describe('Datagrid.vue', () => {
     });
 
     describe('Sorting', () => {
-        it.skip('sorts data when column header is clicked', async () => {
-            render(Datagrid, {
-                props: { gridTitle, filter: { search: '' }, data, columns, currentPage: 1, total: 2, perPage: 10 },
+        it('sorts data when column header is clicked', async () => {
+            const { emitted } = render(Datagrid, {
+                props: { gridTitle, showHeader: true, data, columns, currentPage: 1, total: 2, perPage: 10 },
                 global: { mocks: { $t: mockT, $tc: mockT } },
             });
 
-            const idHeader = screen.getByText('ID');
-            await fireEvent.click(idHeader);
+            const nameButon = screen.getByRole('button', { name: 'Sort by Name' });
+            await fireEvent.click(nameButon);
 
-            expect(screen.getByText('User 1')).toBeInTheDocument();
-            expect(screen.queryByText('User 2')).not.toBeInTheDocument();
-        });
-
-        it.skip('shows sort indicator when column is sorted', async () => {
-            render(Datagrid, {
-                props: { gridTitle, filter: { search: '' }, data, columns, currentPage: 1, perPage: 10, total: 2 },
-                global: { mocks: { $t: mockT, $tc: mockT } },
-            });
-
-            const idHeader = screen.getByText('ID');
-            await fireEvent.click(idHeader);
-
-            expect(screen.getByText('ID')).toHaveClass('sort');
-        });
-
-        it.skip('changes sort direction when column header is clicked', async () => {
-            render(Datagrid, {
-                props: { gridTitle, filter: { search: '' }, data, columns, currentPage: 1, perPage: 10, total: 2 },
-                global: { mocks: { $t: mockT, $tc: mockT } },
-            });
-
-            const idHeader = screen.getByText('ID');
-            await fireEvent.click(idHeader);
-            await fireEvent.click(idHeader);
-
-            expect(screen.getByText('User 2')).toBeInTheDocument();
-            expect(screen.queryByText('User 1')).not.toBeInTheDocument();
+            expect(emitted().sort).toBeTruthy();
         });
     });
 });

@@ -3,15 +3,23 @@ import { useToast } from '@/components/ui/toast/use-toast';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ref } from 'vue';
+import { useContactsStore } from '@/stores/contacts';
 
 export function useResourceHandlers(routeName: string, form?: any) {
+    const contactsStore = useContactsStore();
     const openSheet = ref(false);
     const openAlertDialog = ref(false);
     const alertDialogCustomAction = ref(() => {});
     const { toast } = useToast();
 
+    interface Column {
+        key: string
+        label: string
+        sortable?: boolean
+        sort_direction?: "asc" | "desc"
+    }
+
     const handleAction = (action: Action, item: any) => {
-        console.log(action);
         if (action.destructive) {
             openAlertDialog.value = true;
             alertDialogCustomAction.value = () => {
@@ -72,10 +80,10 @@ export function useResourceHandlers(routeName: string, form?: any) {
         });
     };
 
-    const handleNavigation = (to: string, search: string) => {
+    const handleNavigation = (to: string) => {
         router.get(
             route(routeName + '.index'),
-            { page: to, search },
+            { page: to, search: contactsStore.filter.search, sort: `${contactsStore.filter.sort[0].field}:${contactsStore.filter.sort[0].direction}` },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -85,15 +93,38 @@ export function useResourceHandlers(routeName: string, form?: any) {
     };
 
     const handleSearch = (term: string) => {
+        contactsStore.filter.search = term;
         router.get(
             route(routeName + '.index'),
-            { search: term },
+            { search: term, sort: `${contactsStore.filter.sort[0].field}:${contactsStore.filter.sort[0].direction}` },
             {
                 preserveState: true,
                 preserveScroll: true,
             },
         );
     };
+
+    const handleSorting = (column: Column) => {
+        console.log('Sorting by:', column);
+        if (column.sortable) {
+            console.log(`Sorting by column: ${column.key} (${column.label}) - sortable: ${column.sortable}) ${column.sort_direction}`);
+            column.sort_direction = column.sort_direction == 'asc' ? 'desc' : 'asc'
+            console.log(`Sorting by column: ${column.key} (${column.label}) - sortable: ${column.sortable}) ${column.sort_direction}`);
+            contactsStore.filter.sort = [{
+                field: column.key,
+                direction: column.sort_direction || 'asc',
+            }];
+            router.get(
+                route('contacts.index'),
+                { search: contactsStore.filter.search, sort: `${contactsStore.filter.sort[0].field}:${contactsStore.filter.sort[0].direction}` },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }
+    }
 
     const handlePrimaryAction = () => {
         openSheet.value = true;
@@ -141,6 +172,7 @@ export function useResourceHandlers(routeName: string, form?: any) {
         handleExport,
         handleNavigation,
         handleSearch,
+        handleSorting,
         handlePrimaryAction,
         handleSubmit,
         toggleField,
