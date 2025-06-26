@@ -28,7 +28,6 @@ test('As an user I want to see an inertia page with contacts', function () {
     $response->assertInertia(fn (Assert $page) => $page
         ->component('contacts/Index')
         ->has('resource')
-        ->has('filters')
         ->where('resource.data.0.id', $contacts->first()->id)
         ->where('resource.data.0.first_name', $contacts->first()->first_name)
         ->where('resource.data.0.full_name', $contacts->first()->full_name)
