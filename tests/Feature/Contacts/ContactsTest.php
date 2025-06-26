@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\User;
 use App\Models\Contact;
-use Inertia\Testing\AssertableInertia as Assert;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 

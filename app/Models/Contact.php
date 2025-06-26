@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Contact extends Model
 {
     /** @use HasFactory<\Database\Factories\ContactFactory> */
-    use HasFactory, SoftDeletes, HasUlids;
+    use HasFactory, HasUlids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -39,8 +39,6 @@ class Contact extends Model
 
     /**
      * Get the full name of the contact.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function fullName(): Attribute
     {
