@@ -31,8 +31,8 @@ class OrderRequest extends FormRequest
             'contact_name' => 'required|string|max:255',
             'contact_email' => 'required|email|max:255',
             'contact_phone' => 'nullable|string|max:20',
-            'payment_method' => 'required|in:credit_card,paypal,bank_transfer',
-            'payment_status' => 'required|in:unpaid,paid,refunded',
+            'payment_method' => 'required|in:Credit Card,PayPal,Bank Transfer',
+            'payment_status' => 'required|in:Unpaid,Paid,Refunded',
             'order_date' => 'required|date',
             'total_amount' => 'required|numeric|min:0.01',
         ];

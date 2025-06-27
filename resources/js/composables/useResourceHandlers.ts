@@ -109,11 +109,8 @@ export function useResourceHandlers(routeName: string, form?: any) {
     };
 
     const handleSorting = (column: Column) => {
-        console.log('Sorting by:', column);
         if (column.sortable) {
-            console.log(`Sorting by column: ${column.key} (${column.label}) - sortable: ${column.sortable}) ${column.sort_direction}`);
             column.sort_direction = column.sort_direction == 'asc' ? 'desc' : 'asc';
-            console.log(`Sorting by column: ${column.key} (${column.label}) - sortable: ${column.sortable}) ${column.sort_direction}`);
             contactsStore.filter.sort = [
                 {
                     field: column.key,

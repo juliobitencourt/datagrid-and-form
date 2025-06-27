@@ -16,7 +16,7 @@ Route::get('dashboard', function () {
 Route::get('contacts', [ContactsController::class, 'index'])->middleware(['auth', 'verified'])->name('contacts.index');
 
 Route::middleware(['auth', 'verified'])->prefix('orders')->name('orders.')->group(function () {
-    Route::get('/', [OrdersController::class, 'index'])->name('index');
+    Route::get('/', [OrdersController::class, 'create'])->name('create');
     Route::post('/', [OrdersController::class, 'store'])->name('store');
 });
 

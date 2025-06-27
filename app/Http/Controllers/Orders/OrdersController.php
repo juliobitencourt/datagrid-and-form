@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Orders\OrderRequest;
+use Inertia\Inertia;
 
 class OrdersController extends Controller
 {
@@ -23,7 +24,7 @@ class OrdersController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('orders/Create');
     }
 
     /**
@@ -33,7 +34,7 @@ class OrdersController extends Controller
     {
         Order::create($request->validated());
 
-        return redirect()->route('orders.index')->with('success', 'Order created successfully!');
+        return redirect()->route('orders.create')->with('message', 'Order created successfully!');
     }
 
     /**
