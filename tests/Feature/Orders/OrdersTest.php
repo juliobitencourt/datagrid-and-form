@@ -19,8 +19,8 @@ test('As an user I want to create an order', function () {
         'contact_name' => 'Jane Doe',
         'contact_email' => 'janedoe@example.com',
         'contact_phone' => '555-1234',
-        'payment_method' => 'credit_card',
-        'payment_status' => 'unpaid',
+        'payment_method' => 'Credit Card',
+        'payment_status' => 'Unpaid',
         'order_date' => now(),
         'total_amount' => 99.99,
     ];
@@ -29,8 +29,8 @@ test('As an user I want to create an order', function () {
         ->actingAs($user)
         ->post(route('orders.store'), $orderData);
 
-    $response->assertRedirect(route('orders.index'));
-    $response->assertSessionHas('success', 'Order created successfully!');
+    $response->assertRedirect(route('orders.create'));
+    $response->assertSessionHas('message', 'Order created successfully!');
     $this->assertDatabaseHas('orders', $orderData);
 });
 
