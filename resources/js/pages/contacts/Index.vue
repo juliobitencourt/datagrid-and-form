@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Datagrid } from '@/components/ui/datagrid';
+import { Datagrid } from '@/components/datagrid';
 import { useResourceHandlers } from '@/composables/useResourceHandlers';
 import AppLayout from '@/layouts/AppLayout.vue';
 import ResourceLayout from '@/layouts/ResourceLayout.vue';

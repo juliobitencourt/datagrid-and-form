@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { DatagridActionsMenu } from '@/components/ui/datagrid';
+import { DatagridActionsMenu } from '@/components/datagrid';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/vue';

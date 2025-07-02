@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Filter from '@/components/Filter.vue';;
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { DatagridActionsMenu, DatagridPagination } from '@/components/ui/datagrid';
+import { DatagridActionsMenu, DatagridPagination } from '@/components/datagrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import DatagridExportData from './DatagridExportData.vue';
 import { FunctionalComponent } from 'vue';

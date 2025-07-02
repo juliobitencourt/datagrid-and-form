@@ -1,9 +1,9 @@
-import Datagrid from '@/components/ui/datagrid/Datagrid.vue';
+import Datagrid from '@/components/datagrid/Datagrid.vue';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { describe, expect, it, vi } from 'vitest';
-import { Column } from '@/components/ui/datagrid/Datagrid.vue';
+import { Column } from '@/components/datagrid/Datagrid.vue';
 
 beforeEach(() => {
     setActivePinia(createPinia());

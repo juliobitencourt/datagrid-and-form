@@ -1,4 +1,4 @@
-import { DatagridPagination } from '@/components/ui/datagrid';
+import { DatagridPagination } from '@/components/datagrid';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/vue';
 import { describe, expect, it } from 'vitest';
