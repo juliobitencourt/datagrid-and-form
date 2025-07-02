@@ -4,6 +4,7 @@ import { useContactsStore } from '@/stores/contacts';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ref } from 'vue';
+import { Column } from '@/components/ui/datagrid/Datagrid.vue';
 
 export function useResourceHandlers(routeName: string, form?: any) {
     const contactsStore = useContactsStore();
@@ -11,13 +12,6 @@ export function useResourceHandlers(routeName: string, form?: any) {
     const openAlertDialog = ref(false);
     const alertDialogCustomAction = ref(() => {});
     const { toast } = useToast();
-
-    interface Column {
-        key: string;
-        label: string;
-        sortable?: boolean;
-        sort_direction?: 'asc' | 'desc';
-    }
 
     const handleAction = (action: Action, item: any) => {
         if (action.destructive) {

@@ -19,7 +19,7 @@ import { useContactsStore } from '@/stores/contacts';
 
 const contactsStore = useContactsStore();
 
-interface Column {
+export interface Column {
     key: string
     label: string
     sortable?: boolean

@@ -3,19 +3,13 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { describe, expect, it, vi } from 'vitest';
+import { Column } from '@/components/ui/datagrid/Datagrid.vue';
 
 beforeEach(() => {
     setActivePinia(createPinia());
 });
 
 const gridTitle = 'Users';
-
-interface Column {
-    key: string;
-    label: string;
-    sortable?: boolean;
-    sort_direction?: 'asc' | 'desc';
-}
 
 const columns: Column[] = [
     { key: 'id', label: 'ID' },
