@@ -1,10 +1,9 @@
-import { Action } from '@/components/datagrid/Datagrid.vue';
+import { Action, Column } from '@/components/datagrid/Datagrid.vue';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { useContactsStore } from '@/stores/contacts';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ref } from 'vue';
-import { Column } from '@/components/datagrid/Datagrid.vue';
 
 export function useResourceHandlers(routeName: string, form?: any) {
     const contactsStore = useContactsStore();

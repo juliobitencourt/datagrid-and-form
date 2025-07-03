@@ -1,58 +1,55 @@
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useInitials } from '@/composables/useInitials';
-import { ChevronDown, ChevronUp, ChevronsUpDown, Ellipsis, FileDown, LucideProps, CircleX } from 'lucide-vue-next';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import Filter from '@/components/Filter.vue';;
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DatagridActionsMenu, DatagridPagination } from '@/components/datagrid';
+import Filter from '@/components/Filter.vue';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import DatagridExportData from './DatagridExportData.vue';
-import { FunctionalComponent } from 'vue';
-import _ from 'lodash';
+import { useInitials } from '@/composables/useInitials';
 import { useContactsStore } from '@/stores/contacts';
-
+import _ from 'lodash';
+import { ChevronDown, ChevronUp, ChevronsUpDown, CircleX, Ellipsis, FileDown, LucideProps } from 'lucide-vue-next';
+import { FunctionalComponent, computed, ref, watch } from 'vue';
+import DatagridExportData from './DatagridExportData.vue';
 const contactsStore = useContactsStore();
 
 export interface Column {
-    key: string
-    label: string
-    sortable?: boolean
-    sort_direction?: "asc" | "desc"
+    key: string;
+    label: string;
+    sortable?: boolean;
+    sort_direction?: 'asc' | 'desc';
 }
 
 export interface Action {
-    label: string,
-    destructive?: boolean,
-    icon?: FunctionalComponent<LucideProps, {}, any, {}>,
+    label: string;
+    destructive?: boolean;
+    icon?: FunctionalComponent<LucideProps, any, any, any>;
 }
 
 interface Filter {
-    search: string
-    sort?: string
+    search: string;
+    sort?: string;
 }
 
 interface DatagridProps {
-    gridTitle: string
-    advancedFilter?: boolean
-    showHeader?: boolean
-    checkbox?: boolean
-    export?: boolean
-    avatar?: boolean
-    columns: Column[]
+    gridTitle: string;
+    advancedFilter?: boolean;
+    showHeader?: boolean;
+    checkbox?: boolean;
+    export?: boolean;
+    avatar?: boolean;
+    columns: Column[];
     data: {
-        items: any[]
-    }
-    actions?: Action[]
-    primaryActionTitle?: string,
-    currentPage: number,
-    perPage: number,
-    total: number
+        items: any[];
+    };
+    actions?: Action[];
+    primaryActionTitle?: string;
+    currentPage: number;
+    perPage: number;
+    total: number;
 }
 
 const props = withDefaults(defineProps<DatagridProps>(), {
@@ -66,155 +63,146 @@ const props = withDefaults(defineProps<DatagridProps>(), {
     currentPage: 1,
     perPage: 10,
     total: 0,
-})
+});
 
 const loading = ref(false);
 
-const emit = defineEmits(['action', 'bulk-action', 'search', 'sort', 'export-data', 'primary-action', 'navigation'])
+const emit = defineEmits(['action', 'bulk-action', 'search', 'sort', 'export-data', 'primary-action', 'navigation']);
 
 const { getInitials } = useInitials();
 
-const selectedItems = ref<Set<number>>(new Set())
-const lastSelectedIndex = ref<number | null>(null)
-const isShiftPressed = ref(false)
+const selectedItems = ref<Set<number>>(new Set());
+const lastSelectedIndex = ref<number | null>(null);
+const isShiftPressed = ref(false);
 
 // Computed para saber se todos estão selecionados
 const isAllSelected = computed(() => {
-    return props.data.items.length > 0 && selectedItems.value.size === props.data.items.length
-})
+    return props.data.items.length > 0 && selectedItems.value.size === props.data.items.length;
+});
 
 // Selecionar/deselecionar todos os itens
 const toggleSelectAll = (checked: boolean) => {
-  if (checked) {
-    props.data.items.forEach(item => selectedItems.value.add(item.id))
-  } else {
-    selectedItems.value.clear()
-  }
-}
+    if (checked) {
+        props.data.items.forEach((item) => selectedItems.value.add(item.id));
+    } else {
+        selectedItems.value.clear();
+    }
+};
 
 // Captura se Shift está pressionado
 const captureShiftKey = (event: PointerEvent) => {
-  isShiftPressed.value = event.shiftKey
-}
+    isShiftPressed.value = event.shiftKey;
+};
 
 // Seleção múltipla ao pressionar Shift
 const toggleRowSelection = (id: number, checked: boolean, index: number) => {
-  if (isShiftPressed.value && lastSelectedIndex.value !== null) {
-    const start = Math.min(lastSelectedIndex.value, index)
-    const end = Math.max(lastSelectedIndex.value, index)
+    if (isShiftPressed.value && lastSelectedIndex.value !== null) {
+        const start = Math.min(lastSelectedIndex.value, index);
+        const end = Math.max(lastSelectedIndex.value, index);
 
-    for (let i = start; i <= end; i++) {
-      selectedItems.value.add(props.data.items[i].id)
-    }
-  } else {
-    if (checked) {
-      selectedItems.value.add(id)
+        for (let i = start; i <= end; i++) {
+            selectedItems.value.add(props.data.items[i].id);
+        }
     } else {
-      selectedItems.value.delete(id)
+        if (checked) {
+            selectedItems.value.add(id);
+        } else {
+            selectedItems.value.delete(id);
+        }
+        lastSelectedIndex.value = index;
     }
-    lastSelectedIndex.value = index
-  }
-}
+};
 
 const sortByColumn = (column: Column) => {
-    emit('sort', column)
-}
+    emit('sort', column);
+};
 
 const action = (action: Action, item: any) => {
-    emit('action', action, item)
-}
+    emit('action', action, item);
+};
 
 const bulkAction = (action: string) => {
-    const items = props.data.items.filter(item => selectedItems.value.has(item.id))
-    emit('bulk-action', action, items)
-}
+    const items = props.data.items.filter((item) => selectedItems.value.has(item.id));
+    emit('bulk-action', action, items);
+};
 
 const exportData = (format: string) => {
-    const items = props.data.items.filter(item => selectedItems.value.has(item.id))
-    emit('export-data', format, items)
-}
+    const items = props.data.items.filter((item) => selectedItems.value.has(item.id));
+    emit('export-data', format, items);
+};
 
-const searchTerm = ref(contactsStore.filter.search)
-watch(searchTerm, _.debounce(function (value) {
-    emit('search', value)
-}, 300))
+const searchTerm = ref(contactsStore.filter.search);
+watch(
+    searchTerm,
+    _.debounce(function (value) {
+        emit('search', value);
+    }, 300),
+);
 
 const navigate = (to: string) => {
-    selectedItems.value.clear()
-    emit('navigation', to)
-}
+    selectedItems.value.clear();
+    emit('navigation', to);
+};
 </script>
 
 <template>
-    <div class="bg-datagrid rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
+    <div class="bg-datagrid rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
         <div role="table" class="w-full">
-            <div class="border-b text-left flex items-center text-sm font-semibold p-4">
-                <div class="flex-1 flex items-center">
+            <div class="flex items-center border-b p-4 text-left text-sm font-semibold">
+                <div class="flex flex-1 items-center">
                     <div v-if="checkbox">
-                        <div class="flex items-center justify-start mr-2">
+                        <div class="mr-2 flex items-center justify-start">
                             <Checkbox
                                 id="select-all"
                                 :model-value="isAllSelected"
-                                @update:model-value="(value) => { if (typeof value === 'boolean') toggleSelectAll(value) }"
+                                @update:model-value="
+                                    (value) => {
+                                        if (typeof value === 'boolean') toggleSelectAll(value);
+                                    }
+                                "
                                 aria-label="Select all"
                             />
-                            <Label for="select-all" class="font-semibold ml-4">{{ gridTitle }}</Label>
+                            <Label for="select-all" class="ml-4 font-semibold">{{ gridTitle }}</Label>
                         </div>
                     </div>
                     <span v-else class="p-y mr-4">{{ gridTitle }}</span>
                     <DropdownMenu v-if="selectedItems.size > 0">
                         <DropdownMenuTrigger :as-child="true">
-                            <Button
-                                variant="outline"
-                                class="relative focus-visible:ring-2 focus-visible:ring-primary"
-                                role="button"
-                            >
+                            <Button variant="outline" class="relative focus-visible:ring-2 focus-visible:ring-primary" role="button">
                                 {{ selectedItems.size }} item{{ selectedItems.size > 1 ? 's' : '' }} {{ 'selected' }}
                                 <ChevronsUpDown class="ml-auto size-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-56">
-                            <DatagridActionsMenu
-                                :item="selectedItems"
-                                :actions="actions"
-                                @clicked="bulkAction"
-                            />
+                            <DatagridActionsMenu :item="selectedItems" :actions="actions" @clicked="bulkAction" />
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
                 <div class="flex gap-2">
                     <DropdownMenu v-if="props.export">
                         <DropdownMenuTrigger :as-child="true">
-                            <Button
-                                variant="outline"
-                                class="relative focus-visible:ring-2 focus-visible:ring-primary flex items-center"
-                            >
+                            <Button variant="outline" class="relative flex items-center focus-visible:ring-2 focus-visible:ring-primary">
                                 <FileDown class="size-4" />
                                 <span class="text-xs">Export</span>
                                 <ChevronsUpDown class="ml-auto size-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-56">
-                            <DatagridExportData
-                                @clicked="exportData"
-                            />
+                            <DatagridExportData @clicked="exportData" />
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <div class="relative">
                         <Button
                             v-if="searchTerm"
                             variant="link"
-                            class="absolute right-0 flex items-center pl-3 cursor-pointer z-10"
+                            class="absolute right-0 z-10 flex cursor-pointer items-center pl-3"
                             @click="searchTerm = ''"
                             aria-label="Clear search"
                             role="button"
                         >
                             <CircleX class="size-4 opacity-80 group-hover:opacity-100" />
                         </Button>
-                        <Input
-                            v-model="searchTerm"
-                            placeholder="Search"
-                        />
+                        <Input v-model="searchTerm" placeholder="Search" />
                     </div>
                     <Filter
                         v-if="props.advancedFilter"
@@ -224,10 +212,7 @@ const navigate = (to: string) => {
                         ]"
                         @apply-filters="console.log($event)"
                     />
-                    <Button
-                        variant="outline"
-                        @click="$emit('primary-action')"
-                    >
+                    <Button variant="outline" @click="$emit('primary-action')">
                         {{ primaryActionTitle }}
                     </Button>
                 </div>
@@ -238,7 +223,7 @@ const navigate = (to: string) => {
                 <Skeleton class="h-4 max-w-(--skeleton-width) flex-1" :style="{ '--skeleton-width': 100 }" />
             </div>
             <div v-else>
-                <div v-if="!data.items.length"  class="mt-4 flex min-h-[450px] flex-1 flex-col items-center justify-center space-y-8">
+                <div v-if="!data.items.length" class="mt-4 flex min-h-[450px] flex-1 flex-col items-center justify-center space-y-8">
                     <div class="rounded-full bg-sky-50 p-12 dark:bg-neutral-900">
                         <svg
                             class="h-36 w-36"
@@ -464,15 +449,10 @@ const navigate = (to: string) => {
                 <table v-else class="w-full">
                     <thead v-if="showHeader">
                         <tr class="border-b text-left text-sm font-semibold text-zinc-400">
-                            <th v-if="checkbox" class="w-6 mr-2"></th>
-                            <th v-if="avatar" class="w-12 mr-2"></th>
-                            <th
-                                v-for="column in columns"
-                                :key="column.key"
-                                role="columnheader"
-                                class="p-2 pl-0 flex-1 font-semibold"
-                            >
-                                <div class="flex items-center cursor-pointer">
+                            <th v-if="checkbox" class="mr-2 w-6"></th>
+                            <th v-if="avatar" class="mr-2 w-12"></th>
+                            <th v-for="column in columns" :key="column.key" role="columnheader" class="flex-1 p-2 pl-0 font-semibold">
+                                <div class="flex cursor-pointer items-center">
                                     {{ column.label }}
                                     <Button
                                         v-if="column.sortable"
@@ -483,29 +463,38 @@ const navigate = (to: string) => {
                                         :aria-label="`Sort by ${column.label}`"
                                     >
                                         <ChevronsUpDown class="size-4" v-if="contactsStore.filter.sort[0].field != column.key" />
-                                        <ChevronDown class="size-4" v-else-if="contactsStore.filter.sort[0].field == column.key && contactsStore.filter.sort[0].direction === 'desc'" />
-                                        <ChevronUp class="size-4" v-else-if="contactsStore.filter.sort[0].field == column.key && contactsStore.filter.sort[0].direction === 'asc'" />
+                                        <ChevronDown
+                                            class="size-4"
+                                            v-else-if="
+                                                contactsStore.filter.sort[0].field == column.key && contactsStore.filter.sort[0].direction === 'desc'
+                                            "
+                                        />
+                                        <ChevronUp
+                                            class="size-4"
+                                            v-else-if="
+                                                contactsStore.filter.sort[0].field == column.key && contactsStore.filter.sort[0].direction === 'asc'
+                                            "
+                                        />
                                     </Button>
                                 </div>
                             </th>
-                            <th class="p-2 pl-0 pr-4 text-right">Actions</th>
+                            <th class="p-2 pr-4 pl-0 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody role="rowgroup" class="bg-white dark:bg-datagrid-foreground text-sm">
+                    <tbody role="rowgroup" class="dark:bg-datagrid-foreground bg-white text-sm">
                         <tr
-                            v-if="data.items.length"
                             v-for="(item, index) in data.items"
                             :key="item.id"
                             role="row"
-                            class="border-b px-4 py-1 w-full text-sm text-foreground"
+                            class="w-full border-b px-4 py-1 text-sm text-foreground"
                             :class="{ 'bg-datagrid-odd': selectedItems.has(item.id) }"
                         >
-                            <td v-if="checkbox" class="py-2 px-4">
+                            <td v-if="checkbox" class="px-4 py-2">
                                 <Checkbox
                                     :model-value="selectedItems.has(item.id)"
                                     @pointerdown="captureShiftKey"
                                     @update:model-value="(checked: any) => toggleRowSelection(item.id, checked, index)"
-                                    :aria-label="`${ 'Select item' } ${ item.name }`"
+                                    :aria-label="`${'Select item'} ${item.name}`"
                                     class="mt-[3px]"
                                 />
                             </td>
@@ -521,28 +510,24 @@ const navigate = (to: string) => {
                                 v-for="column in columns"
                                 :key="column.key"
                                 role="cell"
-                                class="p-2 pl-0 flex-1 cursor-pointer hover:underline"
+                                class="flex-1 cursor-pointer p-2 pl-0 hover:underline"
                                 @click="emit('action', 'Clicked', item)"
                             >
                                 {{ item[column.key] }}
                             </td>
-                            <td v-if="actions?.length" role="cell" :class="`p-4 pr-4 flex items-center justify-end space-x-2`">
+                            <td v-if="actions?.length" role="cell" :class="`flex items-center justify-end space-x-2 p-4 pr-4`">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger :as-child="true">
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            class="relative size-10 w-7 h-7 p-1 focus-visible:ring-2 focus-visible:ring-primary"
+                                            class="relative size-10 h-7 w-7 p-1 focus-visible:ring-2 focus-visible:ring-primary"
                                         >
                                             <Ellipsis class="size-5 opacity-80 group-hover:opacity-100" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" class="w-56">
-                                        <DatagridActionsMenu
-                                            :item="item"
-                                            :actions="actions"
-                                            @clicked="action"
-                                        />
+                                        <DatagridActionsMenu :item="item" :actions="actions" @clicked="action" />
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </td>
@@ -554,12 +539,7 @@ const navigate = (to: string) => {
 
         <div class="flex items-center justify-between p-4">
             <span class="text-sm font-semibold">{{ total }} {{ gridTitle.toLowerCase() }} found</span>
-            <DatagridPagination
-                :current-page="currentPage"
-                :per-page="perPage"
-                :total="total"
-                @clicked="navigate"
-            />
+            <DatagridPagination :current-page="currentPage" :per-page="perPage" :total="total" @clicked="navigate" />
         </div>
     </div>
 </template>
